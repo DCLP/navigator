@@ -126,7 +126,7 @@
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
-  <xsl:include href="pi-functions.xsl"/>
+  <xsl:include href="pi-functions.xsl"/><!-- imported more than once because *MakeHTML.xsl imports *metadata.xsl which imports *htm-teibibl.xsl which imports *pi-functions.xsl -->
   
   <xsl:output method="html"/>
   
