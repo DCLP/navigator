@@ -71,6 +71,7 @@
   <xsl:include href="../epidoc-xslt/htm-tpl-structure.xsl"/>
   <xsl:include href="metadata.xsl"/>
   <xsl:key name="lang-codes" match="//pi:lang-codes-to-expansions" use="@code"></xsl:key>
+  <xsl:param name="debug"/>
   <xsl:param name="collection"/>
   <xsl:param name="related"/>
   <xsl:param name="replaces"/>
@@ -222,9 +223,28 @@
         </xsl:if>
       </head>
       <body onload="init()">
+        <xsl:if test="$debug">
+        <div id="debug" style="background: black; color: lime; font-family: Courier New">
+          <table>
+            <thead>
+              <tr><th>Parameter/Variable</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>collection</td><td><xsl:value-of select="string($collection)"/></td></tr>
+              <tr><td>related</td><td><xsl:value-of select="string($related)"/></td></tr>
+              <tr><td>dclp</td><td><xsl:value-of select="string($dclp)"/></td></tr>
+              <tr><td>ddbdp</td><td><xsl:value-of select="string($ddbdp)"/></td></tr>
+              <tr><td>hgv</td><td><xsl:value-of select="string($hgv)"/></td></tr>
+              <tr><td>tm</td><td><xsl:value-of select="string($tm)"/></td></tr>
+              <tr><td>image</td><td><xsl:value-of select="string($image)"/></td></tr>
+              <tr><td>translation</td><td><xsl:value-of select="string($translation)"/></td></tr>
+            </tbody>
+          </table>
+        </div>
+        </xsl:if>
         <div id="d">
           <div id="hd">
-            <h1>Papyri.info</h1>
+            <h1>DCLP</h1>
             <h2 id="login"><a href="/editor/user/signin">sign in</a></h2>   
           </div>
           <div id="bd">
@@ -267,7 +287,6 @@
                       </xsl:if>
                     </div>
                   </xsl:if>
-                  <!-- todo: add dclp handling here, similar to what's below for other collections -->
                   <xsl:if test="$ddbdp">
                     <div id="editthis" class="ui-widget-content ui-corner-all">
                       <a href="/editor/publications/create_from_identifier/papyri.info/ddbdp/{/t:TEI/t:teiHeader/t:fileDesc/t:publicationStmt/t:idno[@type='ddb-hybrid']}" rel="nofollow">open in editor</a>
@@ -281,6 +300,11 @@
                   <xsl:if test="$apis and not($ddbdp or $hgv)">
                     <div id="editthis" class="ui-widget-content ui-corner-all">
                       <a href="/editor/publications/create_from_identifier/papyri.info/apis/{/t:TEI/t:teiHeader/t:fileDesc/t:publicationStmt/t:idno[@type='apisid']}" rel="nofollow">open in editor</a>
+                    </div>
+                  </xsl:if>
+                  <xsl:if test="$dclp and not($ddbdp or $hgv or $apis)">
+                    <div id="editthis" class="ui-widget-content ui-corner-all">
+                      <a href="/editor/publications/create_from_identifier/papyri.info/dclp/{/t:TEI/t:teiHeader/t:fileDesc/t:publicationStmt/t:idno[@type='TM']}" rel="nofollow">open in editor</a>
                     </div>
                   </xsl:if>
                   <div id="canonical-uri" class="ui-widget-content ui-corner-all">
