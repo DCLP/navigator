@@ -134,7 +134,7 @@
   <xsl:template match="/">
     <!-- set variables to control dispatch of transformation based on context -->
     <xsl:variable name="apis" select="$collection = 'apis' or contains($related, '/apis/')"/>
-    <xsl:variable name="dclp" select="$collection = 'dclp'"/>
+    <xsl:variable name="dclp" select="$collection = 'dclp' or contains($related, 'dclp/')"/>
     <xsl:variable name="ddbdp" select="$collection = 'ddbdp'"/>
     <xsl:variable name="hgv" select="$collection = 'hgv' or contains($related, 'hgv/')"/>
     <xsl:variable name="tm" select="contains($related, 'trismegistos.org/')"/>
@@ -232,6 +232,20 @@
             <tbody>
               <tr><td>collection</td><td><xsl:value-of select="string($collection)"/></td></tr>
               <tr><td>related</td><td><xsl:value-of select="string($related)"/></td></tr>
+              <tr><td>relations</td><td><xsl:value-of select="string-join($relations, ', ')"/>
+              <ul>
+                <xsl:for-each select="$relations[contains(., 'hgv/')]">
+                  <li>
+                  <xsl:value-of select="pi:get-filename(., 'xml')"/>
+                  </li>
+                </xsl:for-each>
+                <xsl:for-each select="$relations[contains(., 'dclp/')]">
+                  <li>
+                    <xsl:value-of select="pi:get-filename(., 'xml')"/>
+                  </li>
+                </xsl:for-each>
+              </ul>
+              </td></tr>
               <tr><td>dclp</td><td><xsl:value-of select="string($dclp)"/></td></tr>
               <tr><td>ddbdp</td><td><xsl:value-of select="string($ddbdp)"/></td></tr>
               <tr><td>hgv</td><td><xsl:value-of select="string($hgv)"/></td></tr>
@@ -313,7 +327,7 @@
                   </div>
                 </div>
                 <xsl:if test="$collection = 'ddbdp'">
-                  <xsl:if test="$hgv or $apis">
+                  <xsl:if test="$hgv or $apis or $dclp">
                     <div class="metadata">
                       <xsl:for-each select="$relations[contains(., 'hgv/')]">
                         <xsl:sort select="." order="ascending"/>
@@ -331,6 +345,15 @@
                         </xsl:if>
                       </xsl:for-each>
                       <xsl:for-each select="$relations[contains(., '/apis/')]">
+                        <xsl:sort select="." order="ascending"/>
+                        <xsl:choose>
+                          <xsl:when test="doc-available(pi:get-filename(., 'xml'))">
+                            <xsl:apply-templates select="doc(pi:get-filename(., 'xml'))/t:TEI" mode="metadata"/>
+                          </xsl:when>
+                          <xsl:otherwise><xsl:message>Error: <xsl:value-of select="pi:get-filename(., 'xml')"/> not available. Error in <xsl:value-of select="$doc-id"/>.</xsl:message></xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:for-each>
+                      <xsl:for-each select="$relations[contains(., 'dclp/')]">
                         <xsl:sort select="." order="ascending"/>
                         <xsl:choose>
                           <xsl:when test="doc-available(pi:get-filename(., 'xml'))">
