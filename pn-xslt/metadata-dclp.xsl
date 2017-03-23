@@ -152,7 +152,22 @@
                 </xsl:for-each>
             </td>
         </tr>
+        
+        <!-- Check to see if there is a handDesc. If here is one, add Writing Style. -->
+        <!-- Multiple handDesc values are separated by ; -->
+        <xsl:if test="t:handDesc">
+            <tr>
+                <th class="rowheader">Writing Style</th>
+                <td>
+                    <xsl:for-each select="t:handDesc">
+                        <xsl:value-of select="t:p/t:term"/><xsl:if test="following-sibling::t:handDesc"><xsl:text> ;</xsl:text></xsl:if>
+                    </xsl:for-each>
+                </td>
+            </tr>
+        </xsl:if>
     </xsl:template>
+    
+    
     
     <!-- handle principal edition bibliography -->
     <xsl:template match="t:div[@type = 'bibliography' and @subtype =  'principalEdition']" mode="metadata-dclp">
