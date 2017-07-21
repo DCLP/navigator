@@ -225,7 +225,7 @@
       <body onload="init()">
         <div id="d">
           <div id="hd">
-            <h1>DCLP</h1>
+            <h1>Papyri.info</h1>
             <h2 id="login"><a href="/editor/user/signin">sign in</a></h2>   
           </div>
           <div id="bd">
@@ -295,7 +295,7 @@
                   </div>
                 </div>
                 <xsl:if test="$collection = 'ddbdp'">
-                  <xsl:if test="$hgv or $apis or $dclp">
+                  <xsl:if test="$hgv or $apis or $dclp or $tm">
                     <div class="metadata">
                       <xsl:for-each select="$relations[contains(., 'hgv/')]">
                         <xsl:sort select="." order="ascending"/>
