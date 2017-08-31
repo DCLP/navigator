@@ -53,25 +53,40 @@
     <xsl:variable name="editor"><xsl:call-template name="editor"/></xsl:variable>
     <xsl:variable name="edFirst" select="string-length($author) = 0 and string-length($editor) > 0"/>
     <xsl:variable name="articleTitle"><xsl:call-template name="articleTitle"/></xsl:variable>
-    <xsl:variable name="mainTitle"><xsl:choose>
-      <xsl:when test="(@type='article' or @type='review') and $mainWork//*"><xsl:apply-templates select="$mainWork/t:bibl" mode="mainTitle"/></xsl:when>
-      <xsl:otherwise>
+    <xsl:variable name="mainTitle">
+      <xsl:variable name="title">
         <xsl:choose>
-          <xsl:when test="$biblType = 'principalEdition'">
-            <xsl:choose>
-              <xsl:when test="descendant::t:title[@type='short-Checklist']"><xsl:apply-templates select="descendant::t:title[@type='short-Checklist'][1]"/><xsl:text> </xsl:text></xsl:when>
-              <xsl:otherwise><xsl:apply-templates select="t:title[1]"/><xsl:text> </xsl:text></xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:when test="t:title[@type='main']">
-            <i><xsl:value-of select="t:title[@type='main']"/></i><xsl:if test="t:title[@type='short']"> (<i><xsl:value-of select="t:title[@type='short']"/></i>)</xsl:if>
-          </xsl:when>
+          <xsl:when test="(@type='article' or @type='review') and $mainWork//*"><xsl:apply-templates select="$mainWork/t:bibl" mode="mainTitle"/></xsl:when>
           <xsl:otherwise>
-            <i><xsl:value-of select="t:title[1]"/></i>
+            <xsl:choose>
+              <xsl:when test="$biblType = 'principalEdition'">
+                <xsl:choose>
+                  <xsl:when test="descendant::t:title[@type='short-Checklist']"><xsl:apply-templates select="descendant::t:title[@type='short-Checklist'][1]"/><xsl:text> </xsl:text></xsl:when>
+                  <xsl:otherwise><xsl:apply-templates select="t:title[1]"/><xsl:text> </xsl:text></xsl:otherwise>
+                </xsl:choose>
+              </xsl:when>
+              <xsl:when test="t:title[@type='main']">
+                <i><xsl:value-of select="t:title[@type='main']"/></i><xsl:if test="t:title[@type='short']"> (<i><xsl:value-of select="t:title[@type='short']"/></i>)</xsl:if>
+              </xsl:when>
+              <xsl:otherwise>
+                <i><xsl:value-of select="t:title[1]"/></i>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:otherwise>
-        </xsl:choose>
-      </xsl:otherwise>
-    </xsl:choose></xsl:variable>
+        </xsl:choose>        
+      </xsl:variable>
+      <xsl:choose>
+        <xsl:when test="(@type='article' or @type='review') and $mainWork//*"><xsl:sequence select="$title"/></xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="descendant::t:idno[@type='pi']">
+              <a href="/biblio/{t:idno[@type='pi']}/"><xsl:sequence select="$title"/></a>
+            </xsl:when>
+            <xsl:otherwise><xsl:sequence select="$title"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
     <xsl:variable name="pubInfo"><xsl:call-template name="pubInfo"><xsl:with-param name="main" select="$mainWork"/></xsl:call-template></xsl:variable>
     <xsl:choose>
       <xsl:when test="$biblType = 'title'">
@@ -81,7 +96,7 @@
         </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-    <xsl:if test="t:idno[@type='pi']"><b><xsl:value-of select="t:idno[@type='pi']"/>. </b> </xsl:if><xsl:if test="string-length($author) > 0"><xsl:value-of select="$author"/>, </xsl:if>
+    <xsl:if test="string-length($author) > 0"><xsl:value-of select="$author"/>, </xsl:if>
     <xsl:if test="$edFirst"><xsl:value-of select="normalize-space($editor)"/>, </xsl:if>
     <xsl:if test="t:relatedItem[@type='appearsIn']"><xsl:if test="t:title">"</xsl:if><xsl:copy-of select="$articleTitle"/><xsl:if test="@subtype='journal'">,</xsl:if><xsl:if test="t:title">"</xsl:if><xsl:text> </xsl:text></xsl:if>
     <xsl:copy-of select="$mainTitle"/><xsl:if test="string-length($pubInfo) > 0">, </xsl:if><xsl:value-of select="$pubInfo"/>. </xsl:otherwise></xsl:choose></xsl:template>
@@ -96,7 +111,14 @@
   
   <xsl:template name="articleTitle">
     <xsl:choose>
-      <xsl:when test="t:title[@level='a']"><xsl:value-of select="t:title[@level='a']"/></xsl:when>
+      <xsl:when test="t:title[@level='a']">
+        <xsl:choose>
+          <xsl:when test="descendant::t:idno[@type='pi']">
+            <a href="/biblio/{t:idno[@type='pi']}/"><xsl:value-of select="t:title[@level='a']"/></a>
+          </xsl:when>
+          <xsl:otherwise><xsl:value-of select="t:title[@level='a']"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
       <xsl:when test="@type='review'">Review of <xsl:for-each select="t:relatedItem[@type='reviews']"><xsl:for-each select="pi:get-docs(concat(.//t:ptr/@target, '/source'), 'xml')/t:bibl"><a href="/biblio/{t:idno[@type='pi']}/"><xsl:call-template name="buildCitation"/></a></xsl:for-each></xsl:for-each><xsl:text>, </xsl:text></xsl:when>
     </xsl:choose>
   </xsl:template>
